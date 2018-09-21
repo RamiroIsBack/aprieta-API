@@ -7,6 +7,8 @@ var { User } = require("./models/User");
 
 var app = express();
 app.use(bodyParser.json());
+//routes on an restApi are normally
+//Create(post) R A D
 app.post("/photos", (req, res) => {
   var newPhoto = new Photo(req.body);
   newPhoto
@@ -22,9 +24,7 @@ app.post("/photos", (req, res) => {
 app.listen(3000, () => {
   console.log("start on port 3000");
 });
-//routes on an restApi are normally
-//Create(post) R A D
-
+module.exports = { app };
 // var newUser = new User({
 //   email: "ramiroHatesAmazon@amazonsucks.com"
 // });
