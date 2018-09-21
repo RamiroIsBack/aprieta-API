@@ -20,6 +20,16 @@ app.post("/photos", (req, res) => {
       res.status(400).send(e);
     });
 });
+app.get("/photos", (req, res) => {
+  Photo.find().then(
+    photos => {
+      res.send({ photos, more: "more data in the future" }); //sending the array within an object we prepare to be able to send more data later on if we need it
+    },
+    e => {
+      res.status(400).send(e);
+    }
+  );
+});
 
 app.listen(3000, () => {
   console.log("start on port 3000");
