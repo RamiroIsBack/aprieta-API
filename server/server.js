@@ -1,7 +1,8 @@
-var { mongoose } = require("./db/mongoose");
 var express = require("express");
 var bodyParser = require("body-parser");
+var { ObjectID } = require("mongodb");
 
+var { mongoose } = require("./db/mongoose");
 var { Photo } = require("./models/Photo");
 var { User } = require("./models/User");
 
@@ -29,6 +30,21 @@ app.get("/photos", (req, res) => {
       res.status(400).send(e);
     }
   );
+});
+app.get("/photos/:id", (req, res) => {
+  let id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({});
+  }
+  Photo.findById(id)
+    .then(photo => {
+      if (!photo) {
+        res.status(404).send({});
+      } else {
+        res.status(200).send({ photo });
+      }
+    })
+    .catch(e => res.status(400).send({}));
 });
 
 app.listen(3000, () => {
