@@ -4,6 +4,8 @@ var mongoose = require("mongoose");
 //ramiro@c3po:~/mongo/bin$ ./mongod --dbpath ~/mongo-data
 
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/Aprieta");
+mongoose.connect(
+  process.env.MongoDB_URI || "mongodb://localhost:27017/Aprieta"
+);
 
 module.exports = { mongoose };

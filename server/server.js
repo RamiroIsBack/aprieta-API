@@ -7,6 +7,7 @@ var { Photo } = require("./models/Photo");
 var { User } = require("./models/User");
 
 var app = express();
+const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 //routes on an restApi are normally
 //Create(post) R A D
@@ -47,8 +48,8 @@ app.get("/photos/:id", (req, res) => {
     .catch(e => res.status(400).send({}));
 });
 
-app.listen(3000, () => {
-  console.log("start on port 3000");
+app.listen(port, () => {
+  console.log(`start on port ${port}`);
 });
 module.exports = { app };
 // var newUser = new User({
