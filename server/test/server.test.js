@@ -1,15 +1,18 @@
 const expect = require("expect");
 const request = require("supertest");
+const { ObjectID } = require("mongodb");
 
 const { app } = require("../../server/server");
 const { Photo } = require("../models/Photo");
 
 const photos = [
   {
+    _id: new ObjectID(),
     url: "  mocking up some url for testing   ",
     nombre: "test1"
   },
   {
+    _id: new ObjectID(),
     url: "  mocking up some url for testing again  ",
     nombre: "test2"
   }
@@ -77,6 +80,33 @@ describe("Get /photos", () => {
       .expect(res => {
         expect(res.body.photos.length).toBe(2);
       })
+      .end(done);
+  });
+});
+describe("Get /photos/:id", () => {
+  it("should return photo doc", done => {
+    request(app)
+      .get(`/photos/${photos[0]._id.toHexString()}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.photo.nombre).toBe(photos[0].nombre);
+      })
+      .end(done);
+  });
+  it("should return 404 if photo not found", done => {
+    // let modifiedId = photos[0]._id.toHexString();
+    // modifiedId = modifiedId.replace(modifiedId.charAt(0), "4");
+    let modifiedId = new ObjectID().toHexString();
+    request(app)
+      .get(`/photos/${modifiedId}`)
+      .expect(404)
+      .end(done);
+  });
+  it("should return 404 if id is invalid", done => {
+    let invalidId = `123${photos[0]._id.toHexString()}`;
+    request(app)
+      .get(`/photos/${invalidId}`)
+      .expect(404)
       .end(done);
   });
 });
