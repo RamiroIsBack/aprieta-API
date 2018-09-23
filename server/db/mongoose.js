@@ -6,7 +6,7 @@ var mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 try {
   mongoose.connect(
-    "mongodb://ramiro:password@ds111993.mlab.com:11993/photo-api" ||
+    "mongodb://ramiro:password2@ds111993.mlab.com:11993/photo-api" ||
       "mongodb://localhost:27017/Aprieta",
     { useNewUrlParser: true }
   );
