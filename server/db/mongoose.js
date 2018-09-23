@@ -5,7 +5,9 @@ var mongoose = require("mongoose");
 
 mongoose.Promise = global.Promise;
 mongoose.connect(
-  process.env.MongoDB_URI || "mongodb://localhost:27017/Aprieta"
+  "mongodb://<RamiroIsBack>:<Albamola2017>@ds111993.mlab.com:11993/photo-api" ||
+    "mongodb://localhost:27017/Aprieta",
+  { useNewUrlParser: true }
 );
 
 module.exports = { mongoose };
