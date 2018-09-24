@@ -47,6 +47,21 @@ app.get("/photos/:id", (req, res) => {
     })
     .catch(e => res.status(400).send({}));
 });
+app.delete("/photos/:id", (req, res) => {
+  let id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({});
+  }
+  Photo.findByIdAndRemove(id)
+    .then(doc => {
+      if (!doc) {
+        res.status(404).send({});
+      } else {
+        res.status(200).send({ doc });
+      }
+    })
+    .catch(e => res.status(400).send({}));
+});
 
 app.listen(port, () => {
   console.log(`start on port ${port}`);
