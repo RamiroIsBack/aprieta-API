@@ -4,7 +4,7 @@ var mongoose = require("mongoose");
 //ramiro@c3po:~/mongo/bin$ ./mongod --dbpath ~/mongo-data
 
 mongoose.Promise = global.Promise;
-
+mongoose.set("useFindAndModify", false); //this method is gonna be deprecated
 mongoose
   .connect(
     "mongodb://ramiro:password2@ds111993.mlab.com:11993/photo-api" ||

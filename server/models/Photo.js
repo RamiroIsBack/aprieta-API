@@ -23,6 +23,10 @@ var Photo = mongoose.model("Photo", {
   areaId: {
     type: mongoose.Schema.Types.ObjectId,
     default: null
+  },
+  updatedAt: {
+    type: String,
+    default: new Date().toString()
   }
 });
 
