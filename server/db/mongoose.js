@@ -4,14 +4,18 @@ var mongoose = require("mongoose");
 //ramiro@c3po:~/mongo/bin$ ./mongod --dbpath ~/mongo-data
 
 mongoose.Promise = global.Promise;
-try {
-  mongoose.connect(
+
+mongoose
+  .connect(
     "mongodb://ramiro:password2@ds111993.mlab.com:11993/photo-api" ||
       "mongodb://localhost:27017/Aprieta",
     { useNewUrlParser: true }
-  );
-} catch (e) {
-  console.log("something went wrong connecting to mongolab: ", e);
-}
+  )
+  .then(() => {
+    console.log("conected to mongolab");
+  })
+  .catch(e => {
+    console.log("something went wrong connecting to mongolab: ", e);
+  });
 
 module.exports = { mongoose };

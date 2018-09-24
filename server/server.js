@@ -52,12 +52,3 @@ app.listen(port, () => {
   console.log(`start on port ${port}`);
 });
 module.exports = { app };
-// var newUser = new User({
-//   email: "ramiroHatesAmazon@amazonsucks.com"
-// });
-// newUser.save().then(
-//   doc => {
-//     console.log(doc);
-//   },
-//   err => console.log(err)
-// );
