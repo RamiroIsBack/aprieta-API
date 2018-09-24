@@ -53,11 +53,11 @@ app.delete("/photos/:id", (req, res) => {
     return res.status(404).send({});
   }
   Photo.findByIdAndRemove(id)
-    .then(doc => {
-      if (!doc) {
+    .then(photo => {
+      if (!photo) {
         res.status(404).send({});
       } else {
-        res.status(200).send({ doc });
+        res.status(200).send({ photo });
       }
     })
     .catch(e => res.status(400).send({}));

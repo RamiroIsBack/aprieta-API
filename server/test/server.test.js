@@ -20,6 +20,7 @@ const photos = [
 
 beforeEach(done => {
   //this runs before each test to ensure there is nothing in DB
+  //and always this 2 elements
   Photo.remove({})
     .then(() => {
       Photo.insertMany(photos);
@@ -106,6 +107,43 @@ describe("Get /photos/:id", () => {
     let invalidId = `123${photos[0]._id.toHexString()}`;
     request(app)
       .get(`/photos/${invalidId}`)
+      .expect(404)
+      .end(done);
+  });
+});
+
+describe("DELETE /photos/:id", () => {
+  it("sould remove a photo", done => {
+    var hexId = photos[1]._id.toHexString();
+    request(app)
+      .delete(`/photos/${hexId}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.photo._id).toBe(hexId);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        Photo.findById(hexId)
+          .then(photo => {
+            expect(photo).toBeFalsy();
+            done();
+          })
+          .catch(e => done(e));
+      });
+  });
+  it("should return 404 if photo not found", done => {
+    let hexId = new ObjectID().toHexString();
+    request(app)
+      .delete(`/photos/:${hexId}`)
+      .expect(404)
+      .end(done);
+  });
+  it("should return 404 if id is invalid", done => {
+    let wrongId = "442452";
+    request(app)
+      .delete(`/photos/:${wrongId}`)
       .expect(404)
       .end(done);
   });
