@@ -3,10 +3,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { ObjectID } = require("mongodb");
 
+const { portAndMongodConfig } = require("./config/config");
 var { mongoose } = require("./db/mongoose");
 var { Photo } = require("./models/Photo");
 var { User } = require("./models/User");
 
+console.log("enviroment: ", portAndMongodConfig());
 var app = express();
 const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
