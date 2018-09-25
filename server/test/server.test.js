@@ -148,3 +148,22 @@ describe("DELETE /photos/:id", () => {
       .end(done);
   });
 });
+
+describe("PATCH /photos/:id", () => {
+  it("should update the photo", done => {
+    let hexId = photos[0]._id.toHexString();
+
+    let nombre = "testing patching";
+    let url = "ouyeahhh test this url";
+
+    request(app)
+      .patch(`/photos/${hexId}`)
+      .send({ nombre, url })
+      .expect(200)
+      .expect(res => {
+        expect(res.body.nombre).toBe(nombre);
+        expect(res.body.url).toBe(url);
+      })
+      .end(done);
+  });
+});
