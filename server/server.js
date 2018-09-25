@@ -2,6 +2,7 @@ const _ = require("lodash");
 const express = require("express");
 const bodyParser = require("body-parser");
 const { ObjectID } = require("mongodb");
+const jwt = require("jsonwebtoken");
 
 const { portAndMongodConfig } = require("./config/config");
 var { mongoose } = require("./db/mongoose");
@@ -25,6 +26,19 @@ app.post("/photos", (req, res) => {
     .catch(e => {
       res.status(400).send(e);
     });
+});
+//POST /users
+app.post("/users", (req, res) => {
+  let body = _.pick(req.body, ["email", "password"]);
+  var newUser = new User(body);
+  //
+  newUser
+    .save()
+    .then(() => {
+      return newUser.generateAuthToken();
+    })
+    .then(token => res.header("x-auth", token).send(newUser))
+    .catch(e => res.status(400).send(e));
 });
 app.get("/photos", (req, res) => {
   Photo.find().then(
