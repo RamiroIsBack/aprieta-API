@@ -53,5 +53,26 @@ UserSchema.methods.generateAuthToken = function() {
     return token;
   });
 };
+
+UserSchema.statics.findByToken = function(token) {
+  //calling statics and using uppercase User cos it's model method and not instant method
+  var User = this;
+  var decoded;
+  try {
+    decoded = jwt.verify(token, "abc123");
+  } catch (e) {
+    // return new Promise((resolve, reject) => {
+    //   reject();
+    // }); //we only want to send a reject se we simplify like this:
+    return Promise.reject();
+  }
+  //use quotes when chaining with dots on the key values
+  return User.findOne({
+    _id: decoded._id,
+    "tokens.token": token,
+    "tokens.access": "auth"
+  });
+};
+
 var User = mongoose.model("User", UserSchema);
 module.exports = { User };
