@@ -8,7 +8,7 @@ const { portAndMongodConfig } = require("./config/config");
 var { connectWithDBThroughMongoose } = require("./db/mongoose");
 var { Photo } = require("./models/Photo");
 var { User } = require("./models/User");
-var { authenticate } = require("./middleware/authenticate");
+var { authenticateMiddleware } = require("./middleware/authenticate");
 
 console.log("enviroment: ", portAndMongodConfig());
 connectWithDBThroughMongoose()
@@ -104,7 +104,7 @@ app.post("/users", (req, res) => {
     .catch(e => res.status(400).send(e));
 });
 
-app.get("/users/me", authenticate, (req, res) => {
+app.get("/users/me", authenticateMiddleware, (req, res) => {
   res.send(req.user);
 });
 
