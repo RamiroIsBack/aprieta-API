@@ -4,29 +4,11 @@ const { ObjectID } = require("mongodb");
 
 const { app } = require("../../server/server");
 const { Photo } = require("../models/Photo");
+const { User } = require("../models/User");
+const { photos, users, populatePhotos, populateUsers } = require("./seed/seed");
 
-const photos = [
-  {
-    _id: new ObjectID(),
-    url: "  mocking up some url for testing   ",
-    nombre: "test1"
-  },
-  {
-    _id: new ObjectID(),
-    url: "  mocking up some url for testing again  ",
-    nombre: "test2"
-  }
-];
-
-beforeEach(done => {
-  //this runs before each test to ensure there is nothing in DB
-  //and always this 2 elements
-  Photo.remove({})
-    .then(() => {
-      Photo.insertMany(photos);
-    })
-    .then(() => done());
-});
+beforeEach(populateUsers);
+beforeEach(populatePhotos);
 
 describe("POST /photos", () => {
   it("should create a new photo", done => {
@@ -164,6 +146,66 @@ describe("PATCH /photos/:id", () => {
         expect(res.body.nombre).toBe(nombre);
         expect(res.body.url).toBe(url);
       })
+      .end(done);
+  });
+});
+describe("GET /user/me", () => {
+  it("should return user if authenticated", done => {
+    request(app)
+      .get("/users/me")
+      .set("x-auth", users[0].tokens[0].token)
+      .expect(200)
+      .expect(res => {
+        expect(res.body._id).toBe(users[0]._id.toHexString());
+        expect(res.body.email).toBe(users[0].email);
+      })
+      .end(done);
+  });
+  it("has to return 401 if not authenticated", done => {
+    request(app)
+      .get("/users/me")
+      .set("x-auth", "sdfsdf")
+      .expect(401)
+      .expect(res => expect(res.body).toEqual({}))
+      .end(done);
+  });
+});
+describe("POST /users", () => {
+  it("should create a user", done => {
+    var email = "example@gmail.com";
+    var password = "password";
+    request(app)
+      .post("/users")
+      .send({ email, password })
+      .expect(200)
+      .expect(res => {
+        expect(res.headers["x-auth"]).toBeTruthy();
+        expect(res.body._id).toBeTruthy();
+        expect(res.body.email).toBe(email);
+      })
+      .end(err => {
+        if (err) {
+          return done(err);
+        }
+        User.findOne({ email }).then(user => {
+          expect(user).toBeTruthy();
+          expect(user.password).not.toBe(password); //should have been hashed
+          done();
+        });
+      });
+  });
+  it("should return validation errors if request invalid", done => {
+    request(app)
+      .post("/users")
+      .send({ email: "invalidEmail", password: "short" })
+      .expect(400)
+      .end(done);
+  });
+  it("should not create user if password is in use", done => {
+    request(app)
+      .post("/users")
+      .send({ email: users[1].email, password: "lkdsffsfsdd" })
+      .expect(400)
       .end(done);
   });
 });
