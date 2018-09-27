@@ -119,6 +119,14 @@ app.post("/users/login", (req, res) => {
       res.status(400).send(e);
     });
 });
+app.delete("/users/me/token", authenticateMiddleware, (req, res) => {
+  req.user
+    .removeToken(req.token)
+    .then(() => {
+      res.status(200).send();
+    })
+    .catch(e => res.status(400).send());
+});
 
 app.listen(port, () => {
   console.log(`start on port ${port}`);

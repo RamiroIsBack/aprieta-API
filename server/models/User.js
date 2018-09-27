@@ -54,6 +54,17 @@ UserSchema.methods.generateAuthToken = function() {
     return token;
   });
 };
+UserSchema.methods.removeToken = function(token) {
+  var user = this;
+  //pull operator from mongoose erase a object that have a property equal to the one we pass
+  return user.update({
+    $pull: {
+      tokens: {
+        token
+      }
+    }
+  });
+};
 
 UserSchema.statics.findByToken = function(token) {
   //calling statics and using uppercase User cos it's model method and not instant method
