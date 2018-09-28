@@ -19,9 +19,12 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 //routes on an restApi are normally
 //Create(post) R A D
-app.post("/photos", (req, res) => {
-  let body = Object.assign({}, req.body);
-  var newPhoto = new Photo(body);
+app.post("/photos", authenticateMiddleware, (req, res) => {
+  var newPhoto = new Photo({
+    nombre: req.body.nombre,
+    url: req.body.url,
+    userId: req.user._id
+  });
   newPhoto
     .save()
     .then(doc => {
@@ -44,49 +47,59 @@ app.get("/photos", (req, res) => {
 app.get("/photos/:id", (req, res) => {
   let id = req.params.id;
   if (!ObjectID.isValid(id)) {
-    return res.status(404).send({});
+    return res.status(404).send();
   }
   Photo.findById(id)
     .then(photo => {
       if (!photo) {
-        res.status(404).send({});
+        res.status(404).send();
       } else {
         res.status(200).send({ photo });
       }
     })
-    .catch(e => res.status(400).send({}));
+    .catch(e => res.status(400).send());
 });
-app.delete("/photos/:id", (req, res) => {
+app.delete("/photos/:id", authenticateMiddleware, (req, res) => {
   let id = req.params.id;
   if (!ObjectID.isValid(id)) {
-    return res.status(404).send({});
+    return res.status(404).send();
   }
-  Photo.findByIdAndRemove(id)
+  Photo.findOneAndRemove({
+    _id: id,
+    userId: req.user._id
+  })
     .then(photo => {
       if (!photo) {
-        res.status(404).send({});
+        res.status(404).send();
       } else {
         res.status(200).send({ photo });
       }
     })
-    .catch(e => res.status(400).send({}));
+    .catch(e => res.status(400).send());
 });
-app.patch("/photos/:id", (req, res) => {
+app.patch("/photos/:id", authenticateMiddleware, (req, res) => {
   var id = req.params.id;
-  var body = _.pick(req.body, ["nombre", "url"]);
 
+  var body = _.pick(req.body, ["nombre", "url"]);
+  if (!body.nombre && !body.url) {
+    return res.status(400).send();
+  }
   if (!ObjectID.isValid(id)) {
-    return res.status(404).send({});
+    return res.status(404).send();
   }
   body.updatedAt = new Date().toString();
-  Photo.findByIdAndUpdate(id, { $set: body }, { new: true })
+  Photo.findOneAndUpdate(
+    { _id: id, userId: req.user._id },
+    { $set: body },
+    { new: true }
+  )
     .then(photo => {
       if (!photo) {
-        return res.status(404).send({});
+        return res.status(404).send();
       }
       res.send(photo);
     })
-    .catch(e => res.status(400).send({}));
+    .catch(e => res.status(400).send());
 });
 
 //users

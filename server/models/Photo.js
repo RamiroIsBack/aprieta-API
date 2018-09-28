@@ -14,7 +14,7 @@ var Photo = mongoose.model("Photo", {
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    default: null
+    required: true
   },
   problemId: {
     type: mongoose.Schema.Types.ObjectId,

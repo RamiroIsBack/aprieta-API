@@ -16,6 +16,7 @@ describe("POST /photos", () => {
     var nombre = "photoTest1    ";
     request(app)
       .post("/photos")
+      .set("x-auth", users[0].tokens[0].token)
       .send({ url, nombre })
       .expect(200)
       .expect(res => {
@@ -39,6 +40,7 @@ describe("POST /photos", () => {
   it("should not create a photo with invalid body data", done => {
     request(app)
       .post("/photos")
+      .set("x-auth", users[0].tokens[0].token)
       .send({}) //sending an empty object
       .expect(400)
       .end((err, res) => {
@@ -99,6 +101,7 @@ describe("DELETE /photos/:id", () => {
     var hexId = photos[1]._id.toHexString();
     request(app)
       .delete(`/photos/${hexId}`)
+      .set("x-auth", users[1].tokens[0].token)
       .expect(200)
       .expect(res => {
         expect(res.body.photo._id).toBe(hexId);
@@ -115,10 +118,29 @@ describe("DELETE /photos/:id", () => {
           .catch(e => done(e));
       });
   });
+  it("sould not remove a photo that doesn't belong to that user", done => {
+    var hexId = photos[0]._id.toHexString();
+    request(app)
+      .delete(`/photos/${hexId}`)
+      .set("x-auth", users[1].tokens[0].token)
+      .expect(404)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        Photo.findById(hexId)
+          .then(photo => {
+            expect(photo).toBeTruthy();
+            done();
+          })
+          .catch(e => done(e));
+      });
+  });
   it("should return 404 if photo not found", done => {
     let hexId = new ObjectID().toHexString();
     request(app)
       .delete(`/photos/:${hexId}`)
+      .set("x-auth", users[1].tokens[0].token)
       .expect(404)
       .end(done);
   });
@@ -126,6 +148,7 @@ describe("DELETE /photos/:id", () => {
     let wrongId = "442452";
     request(app)
       .delete(`/photos/:${wrongId}`)
+      .set("x-auth", users[1].tokens[0].token)
       .expect(404)
       .end(done);
   });
@@ -140,12 +163,26 @@ describe("PATCH /photos/:id", () => {
 
     request(app)
       .patch(`/photos/${hexId}`)
+      .set("x-auth", users[0].tokens[0].token)
       .send({ nombre, url })
       .expect(200)
       .expect(res => {
         expect(res.body.nombre).toBe(nombre);
         expect(res.body.url).toBe(url);
       })
+      .end(done);
+  });
+  it("should not update the photo of another user", done => {
+    let hexId = photos[0]._id.toHexString();
+
+    let nombre = "testing patching";
+    let url = "ouyeahhh test this url";
+
+    request(app)
+      .patch(`/photos/${hexId}`)
+      .send({ nombre, url })
+      .set("x-auth", users[1].tokens[0].token)
+      .expect(404)
       .end(done);
   });
 });
@@ -229,7 +266,7 @@ describe("POST /users/login", () => {
         }
         User.findById(users[1]._id)
           .then(user => {
-            expect(user.tokens[0]).toMatchObject({
+            expect(user.tokens[1]).toMatchObject({
               access: "auth",
               token: res.headers["x-auth"]
             });
@@ -255,7 +292,7 @@ describe("POST /users/login", () => {
         }
         User.findById(users[1]._id)
           .then(user => {
-            expect(user.tokens.length).toBe(0);
+            expect(user.tokens.length).toBe(1);
             done();
           })
           .catch(e => done(e));

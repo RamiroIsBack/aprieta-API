@@ -22,7 +22,13 @@ const users = [
   {
     _id: userTwoId,
     email: "kate@test.com",
-    password: "password2"
+    password: "password2",
+    tokens: [
+      {
+        access: "auth",
+        token: jwt.sign({ _id: userTwoId, access: "auth" }, "abc123").toString()
+      }
+    ]
   }
 ];
 
@@ -30,12 +36,14 @@ const photos = [
   {
     _id: new ObjectID(),
     url: "  mocking up some url for testing   ",
-    nombre: "test1"
+    nombre: "test1",
+    userId: userOneId
   },
   {
     _id: new ObjectID(),
     url: "  mocking up some url for testing again  ",
-    nombre: "test2"
+    nombre: "test2",
+    userId: userTwoId
   }
 ];
 
